@@ -78,12 +78,13 @@ class Customer implements user
             double cost = A.getPrice();
             if (A.getOffer().equals("BOGO")) { q = (q + 1) / 2; A.Required=q*2; }
             if (A.getOffer().equals("25%OFF")) { cost = cost * (0.75); }
+            if (A.getQuantity()<A.Required) {A.Required=A.getQuantity();}
             cost = cost * q;
             double user_cost = cost * (1.005);
             double merchant_cost = cost * (0.995);
             if (user_cost > Main_Balance + Reward_Balance)
             {
-                System.out.println("Insufficient Balance!");
+                System.out.println("Insufficient Balance! for "+A.getName());
                 return 0;
             }
             else
@@ -103,7 +104,7 @@ class Customer implements user
         }
         else
         {
-            System.out.println("Insufficient Stock!");
+            System.out.println("Insufficient Stock! for "+A.getName());
             return 0;
         }
     }
@@ -149,7 +150,8 @@ class Merchant implements user
         System.out.println("<---------- Merchant Details ---------->");
         System.out.println("Name: " + Name);
         System.out.println("Address: " + Address);
-        System.out.println("Total Contribution To Company: " + Contribution);
+        System.out.printf("Total Contribution To Company: Rs %.2f",Contribution);
+        System.out.println();
         System.out.println("<-------------------------------------->");
     }
     //Getters & Setters
@@ -270,6 +272,7 @@ public class Mercury
             System.out.println("5: Exit ");
             System.out.println(">>>-----------------------<<<");
             Q = in.nextInt();
+            in.nextLine();
             switch (Q)
             {
                 case 1:
@@ -298,6 +301,7 @@ public class Mercury
                         System.out.println("6: Exit ");
                         System.out.println(">>>-----------------------<<<");
                         Q_Merchant = in.nextInt();
+                        in.nextLine();
                         switch (Q_Merchant)
                         {
                             case 1:
@@ -307,7 +311,7 @@ public class Mercury
                                     if (Cur.getSlots()>0) { Cur.setSlots(Cur.getSlots()-1);}
                                     else { Cur.setReward_Slots(Cur.getReward_Slots()-1);}
                                     System.out.print("Name: ");
-                                    String Name = in.next();
+                                    String Name = in.nextLine();
                                     System.out.print("Price: ");
                                     Double Price = Double.parseDouble(in.next());
                                     System.out.print("Quantity: ");
@@ -325,6 +329,9 @@ public class Mercury
 
                             case 2:
                                 // Edit Item Details
+                                for (Item S : Z.getI())
+                                    if(S.getMerchant().equals(Cur.getName()))
+                                        System.out.println(S.getCode()+": "+S.getName());
                                 System.out.print("Enter Item Code: ");
                                 int c = Integer.parseInt(in.next());
                                 for (Item A:Z.getI())
@@ -358,13 +365,15 @@ public class Mercury
                                                 {
                                                     if (B.getMerchant().equals(Cur.getName()))
                                                     {
-                                                        System.out.printf("> Your Price: Rs %.2f", B.getPrice());
+                                                        System.out.printf(">> Your Price: Rs %.2f", B.getPrice());
                                                         System.out.println();
+                                                        System.out.println("  Quantity Available With You: "+ B.getQuantity());
                                                     }
                                                         else
                                                     {
-                                                        System.out.printf("> " + B.getMerchant() + "'s Price: Rs %.2f",B.getPrice());
+                                                        System.out.printf(">> " + B.getMerchant() + "'s Price: Rs %.2f",B.getPrice());
                                                         System.out.println();
+                                                        System.out.println("   Quantity Available with "+B.getMerchant()+": "+B.getQuantity());
                                                     }
                                                 }
                                             }
@@ -374,6 +383,9 @@ public class Mercury
 
                             case 4:
                                 // Add Offer
+                                for (Item S : Z.getI())
+                                    if(S.getMerchant().equals(Cur.getName()))
+                                        System.out.println(S.getCode()+": "+S.getName());
                                 System.out.print("Enter Item Code: ");
                                 int d = in.nextInt();
                                 for (Item A:Z.getI())
@@ -431,6 +443,7 @@ public class Mercury
                         System.out.println("5: Exit ");
                         System.out.println(">>>-----------------------<<<");
                         Q_Customer=in.nextInt();
+                        in.nextLine();
                         switch (Q_Customer)
                         {
                             case 1:
@@ -458,6 +471,7 @@ public class Mercury
                                     System.out.println("2: Add To Cart");
                                     System.out.println("3: Exit");
                                     Q_Item_List =in.nextInt();
+                                    in.nextLine();
                                     if (Q_Item_List==3)
                                         break;
                                     else
@@ -478,7 +492,15 @@ public class Mercury
                                                     Ptr.setReward_Balance(10*((int)(Ptr.getNumber_Of_Orders()/5)));
                                                 }
                                                 else if (Q_Item_List==2)
-                                                { Ptr.getCart().add(A); }
+                                                {
+                                                    if (A.getQuantity()<A.Required)
+                                                    { System.out.println("Sorry Not Enough Stock Available!");}
+                                                    else
+                                                    {
+                                                        Ptr.getCart().add(A);
+                                                        System.out.println(A.Required + " units of " + A.getName() + " added to cart");
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -487,12 +509,24 @@ public class Mercury
 
                             case 2:
                                 // Checkout
-                                for (Item P : Ptr.getCart())
-                                    if (Ptr.Buy_Item(P,Z)==0)
-                                        break;
-                                Ptr.setNumber_Of_Orders(Ptr.getNumber_Of_Orders()+1);
-                                Ptr.setReward_Balance(10*((int)(Ptr.getNumber_Of_Orders()/5)));
-                                Ptr.getCart().clear();
+                                if (Ptr.getCart().isEmpty())
+                                    System.out.println("Your Cart Is Empty.");
+                                else
+                                    {
+                                        int f = 1;
+                                        for (Item P : Ptr.getCart())
+                                            if (Ptr.Buy_Item(P, Z) == 0)
+                                            {
+                                                f = 0;
+                                                break;
+                                            }
+                                        if (f == 1)
+                                        {
+                                            Ptr.setNumber_Of_Orders(Ptr.getNumber_Of_Orders() + 1);
+                                            Ptr.setReward_Balance(10 * ((int) (Ptr.getNumber_Of_Orders() / 5)));
+                                        }
+                                        Ptr.getCart().clear();
+                                    }
                                 break;
 
                             case 3:
@@ -555,7 +589,6 @@ public class Mercury
                     System.out.println("Invalid Query, Please Enter Again");
             }
         } while (Q!=5);
-
     }
 }
 // END OF CODE
