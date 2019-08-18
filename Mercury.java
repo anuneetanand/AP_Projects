@@ -3,7 +3,6 @@
 // CSE
 // AP Lab 2 - Mercury
 
-import java.security.PublicKey;
 import java.util.*;
 
 interface user
@@ -59,7 +58,7 @@ class Customer implements user
         while ((i<10) && (L-i>0))
         {
             Item x = Bought_Items.get(L-i-1);
-            System.out.print("Bought item "+x.getName()+ "(Quantity:"+x.getQuantity()+") for Rs ");
+            System.out.print("Bought item "+x.getName()+ " (Quantity:"+x.getQuantity()+") for Rs ");
             System.out.printf("%.2f",x.getPrice());
             System.out.print(" from Merchant:"+x.getMerchant());
             System.out.println();
@@ -85,7 +84,7 @@ class Customer implements user
             double merchant_cost = cost * (0.995);
             if (user_cost > Main_Balance + Reward_Balance)
             {
-                System.out.println("Insufficient Balance! for "+A.getName());
+                System.out.println("Insufficient Balance for buying "+A.getName());
                 return 0;
             }
             else
@@ -105,7 +104,7 @@ class Customer implements user
         }
         else
         {
-            System.out.println("Insufficient Stock! for "+A.getName());
+            System.out.println("Insufficient Stock for "+A.getName());
             return 0;
         }
     }
@@ -118,8 +117,7 @@ class Customer implements user
     public void setReward_Balance(double reward_Balance) { Reward_Balance = reward_Balance; }
     public ArrayList<Item> getCart() { return Cart; }
     public double getMain_Balance() { return Main_Balance; }
-    public void setMain_Balance(double main_Balance)
-    { Main_Balance = main_Balance; }
+    public void setMain_Balance(double main_Balance) { Main_Balance = main_Balance; }
 }
 
 class Merchant implements user
@@ -328,7 +326,7 @@ public class Mercury
                                     A.print_details();
                                 }
                                 else
-                                { System.out.println("Sorry! You don't have sufficient slots."); }
+                                { System.out.println("Sorry! You don't have sufficient slots"); }
                                 break;
 
                             case 2:
@@ -341,9 +339,9 @@ public class Mercury
                                 for (Item A:Z.getI())
                                     if ((A.getCode()==c) && (A.getMerchant().equals(Cur.getName())))
                                     {
-                                        System.out.println("New Price ? ");
+                                        System.out.println("New Price for "+A.getName()+" ?");
                                         A.setPrice(in.nextDouble());
-                                        System.out.println("New Quantity ? ");
+                                        System.out.println("New Quantity for "+A.getName()+" ?");
                                         A.setQuantity(in.nextInt());
                                         A.print_details();
                                     }
@@ -492,7 +490,8 @@ public class Mercury
                                                 if (Q_Item_List==1)
                                                 {
                                                     Ptr.Buy_Item(A,Z);
-                                                    System.out.println("Your Balance : "+ Ptr.getMain_Balance());
+                                                    System.out.printf("Your Balance : Rs %.2f",Ptr.getMain_Balance());
+                                                    System.out.println();
                                                     Ptr.setNumber_Of_Orders(Ptr.getNumber_Of_Orders()+1);
                                                     Ptr.setReward_Balance(10*((int)(Ptr.getNumber_Of_Orders()/5)));
                                                 }
@@ -525,7 +524,8 @@ public class Mercury
                                                 f = 0;
                                                 break;
                                             }
-                                        System.out.println("Your Balance : "+ Ptr.getMain_Balance());
+                                        System.out.printf("Your Balance : Rs %.2f", Ptr.getMain_Balance());
+                                        System.out.println();
                                         if (f == 1)
                                         {
                                             Ptr.setNumber_Of_Orders(Ptr.getNumber_Of_Orders() + 1);
