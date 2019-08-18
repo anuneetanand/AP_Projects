@@ -369,7 +369,7 @@ public class Mercury
                                                     {
                                                         System.out.printf(">> Your Price: Rs %.2f", B.getPrice());
                                                         System.out.println();
-                                                        System.out.println("  Quantity Available With You: "+ B.getQuantity());
+                                                        System.out.println("   Quantity Available With You: "+ B.getQuantity());
                                                     }
                                                         else
                                                     {
@@ -489,10 +489,10 @@ public class Mercury
                                                 A.Required=q;
                                                 if (Q_Item_List==1)
                                                 {
-                                                    Ptr.Buy_Item(A,Z);
+                                                    int f = Ptr.Buy_Item(A,Z);
                                                     System.out.printf("Your Balance : Rs %.2f",Ptr.getMain_Balance());
                                                     System.out.println();
-                                                    Ptr.setNumber_Of_Orders(Ptr.getNumber_Of_Orders()+1);
+                                                    if (f==1){Ptr.setNumber_Of_Orders(Ptr.getNumber_Of_Orders()+1);}
                                                     Ptr.setReward_Balance(10*((int)(Ptr.getNumber_Of_Orders()/5)));
                                                 }
                                                 else if (Q_Item_List==2)
