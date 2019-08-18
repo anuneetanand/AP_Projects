@@ -3,6 +3,7 @@
 // CSE
 // AP Lab 2 - Mercury
 
+import java.security.PublicKey;
 import java.util.*;
 
 interface user
@@ -116,6 +117,9 @@ class Customer implements user
     public double getReward_Balance() { return Reward_Balance; }
     public void setReward_Balance(double reward_Balance) { Reward_Balance = reward_Balance; }
     public ArrayList<Item> getCart() { return Cart; }
+    public double getMain_Balance() { return Main_Balance; }
+    public void setMain_Balance(double main_Balance)
+    { Main_Balance = main_Balance; }
 }
 
 class Merchant implements user
@@ -488,6 +492,7 @@ public class Mercury
                                                 if (Q_Item_List==1)
                                                 {
                                                     Ptr.Buy_Item(A,Z);
+                                                    System.out.println("Your Balance : "+ Ptr.getMain_Balance());
                                                     Ptr.setNumber_Of_Orders(Ptr.getNumber_Of_Orders()+1);
                                                     Ptr.setReward_Balance(10*((int)(Ptr.getNumber_Of_Orders()/5)));
                                                 }
@@ -520,6 +525,7 @@ public class Mercury
                                                 f = 0;
                                                 break;
                                             }
+                                        System.out.println("Your Balance : "+ Ptr.getMain_Balance());
                                         if (f == 1)
                                         {
                                             Ptr.setNumber_Of_Orders(Ptr.getNumber_Of_Orders() + 1);
