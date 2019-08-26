@@ -32,7 +32,7 @@ abstract class Hero
         Location =0;
     }
 
-    public void Attack(Monster M)
+    protected void Attack(Monster M)
     {
         System.out.println("You Chose To Attack.");
         System.out.println("Inflicted "+ this.AP + " Damage To The Monster");
@@ -43,9 +43,10 @@ abstract class Hero
         if (Moves_Special==0)
             Moves_Count++;
     }
-    public  void Defend(Monster M)
+
+    protected void Defend(Monster M)
     {
-        System.out.println("You Choose To Defend");
+        System.out.println("You Chose To Defend");
         System.out.println("Monster Attack Reduced By "+ this.DP);
         System.out.println("Your HP: "+ this.HP+"/"+this.Max_HP);
         System.out.println("Monster HP: "+ M.HP+"/"+M.Max_HP);
@@ -53,7 +54,18 @@ abstract class Hero
             Moves_Count++;
     }
 
-    public abstract void Use_Special_Power(Monster M);
+    protected abstract void Use_Special_Power(Monster M);
+
+    public void Print_Details()
+    {
+        System.out.println("<--- Player Info --->");
+        System.out.println("Avatar: "+this.getClass());
+        System.out.println("Level: "+this.Level);
+        System.out.println("HP: "+this.HP);
+        System.out.println("XP: "+this.XP);
+        System.out.println("Kills: "+this.Kills);
+        System.out.println("Attack Power: "+this.AP+"  Defense Power: "+this.DP);
+    }
 }
 
 class Warrior extends Hero
@@ -63,7 +75,7 @@ class Warrior extends Hero
     @Override
     public void Use_Special_Power(Monster M)
     {
-        if (this.Moves_Special==3)
+        if (this.Moves_Special==4)
         {
             this.AP += 5;
             this.DP += 5;
@@ -102,8 +114,9 @@ class Thief extends Hero
     @Override
     public void Use_Special_Power(Monster M)
     {
-        this.Moves_Special--;
+        this.Moves_Special=0;
         this.HP += (int)(0.3 * M.HP);
+        if (this.HP>this.Max_HP){this.HP=this.Max_HP;}
         M.HP=(int)(0.7 * M.HP);
         System.out.println("You Stole 30% Of Opponent's HP.");
         System.out.println("Your New HP:"+this.HP+"/"+this.Max_HP);
@@ -120,6 +133,7 @@ class Healer extends Hero
     {
         this.Moves_Special--;
         this.HP = (int)(1.05*this.HP);
+        if (this.HP>this.Max_HP){this.HP=this.Max_HP;}
         System.out.println("HP Rose By 5%");
         System.out.println("Your New HP:"+this.HP+"/"+this.Max_HP);
     }
@@ -138,18 +152,18 @@ abstract class Monster
         this.Level = Level;
     }
 
-    public int GAP ()
+    private int GAP ()
     {
         Random r = new Random();
         double x=-2;
         while ((x<-1)||(x>1))
         { x = r.nextGaussian(); }
-        x+=1;
-        x *=this.HP/8;
+        x += 1;
+        x *= this.HP/16;
         return (int)(x);
     }
 
-    public void Attack(Hero H, int x)
+    protected void Attack(Hero H, int x)
     {
         int D=GAP();
         System.out.println("Monster Attacks!");
@@ -160,11 +174,20 @@ abstract class Monster
                 D = H.HP / 2;
             }
         if (x==1) {D-=H.DP;}
+        if (D<0) {D=0;}
         H.HP-=D;
         if (H.HP<0){H.HP=0;}
         System.out.println("The Monster Attacked & Inflicted "+D+" Damage To You.");
         System.out.println("Your HP: "+ H.HP+"/"+H.Max_HP);
-        System.out.println("Monster HP: "+HP+"/"+Max_HP);
+        System.out.println("Monster HP: "+this.HP+"/"+this.Max_HP);
+    }
+
+    public void Print_Details()
+    {
+        System.out.println("<--- Monster Info --->");
+        System.out.println("Type: "+this.getClass());
+        System.out.println("Level: "+this.Level);
+        System.out.println("HP: "+this.HP);
     }
 }
 
@@ -212,7 +235,7 @@ class user
 
 class Game
 {
-    Scanner in = new Scanner(System.in);
+    private Scanner in = new Scanner(System.in);
     private ArrayList <user> Usernames;
     private ArrayList <Monster> Area;
 
@@ -226,7 +249,7 @@ class Game
         Area.add(new LionFang());
     }
 
-    public Monster Random_Monster()
+    private Monster Random_Monster()
     {
         Random r = new Random();
         int x = r.nextInt(3)+1;
@@ -246,50 +269,64 @@ class Game
     public void Play(user U)
     {
         System.out.println("Starting Game...");
-        System.out.println("Welcome "+ U.getName()+", You Are At Location"+U.getAvatar().Location);
+        System.out.println("Welcome "+ U.getName()+", You Are At Location: "+U.getAvatar().Location);
         Hero Player = U.getAvatar();
         int Pos = -1;
-        while(Pos!=0 && Pos!=40)
+        while(Pos!=0 && Pos<40 && Player.HP>0)
         {
             Pos=Move(Player,Player.Location);
             Player.Location=Pos;
             if (Pos==40)
-                System.out.println("Boss Level");
+                System.out.println("> Boss Level");
             else
-                System.out.println("You Are At Location"+Player.Location);
+                System.out.println("> You Are At Location: "+Player.Location);
             if (Pos>0 && Pos<=40)
                 Fight(Player,Area.get(Pos),Pos);
         }
+        Player.Location = 0;
+        Player.HP=Player.Max_HP;
     }
 
     public int Move(Hero H,int i)
     {
         System.out.println("Choose A Path :-");
-        System.out.println("1: Go To Location"+(3*i+1));
-        System.out.println("2: Go To Location"+(3*i+2));
-        System.out.println("3: Go To Location"+(3*i+3));
+        System.out.println("1: Go To Location: "+(3*i+1));
+        System.out.println("2: Go To Location: "+(3*i+2));
+        System.out.println("3: Go To Location: "+(3*i+3));
         System.out.println("4: Go Back");
-        System.out.println("Press Any Other Key To Exit");
+        System.out.println("5: Print Stats");
+        System.out.println("6: Hint");
+        System.out.println("Press -1 To Exit");
         int c = in.nextInt();
-        if (i>12)
-            return 40;
-        switch(c)
+        while (c==5)
         {
-            case 1:
-                return (3*i+1);
-            case 2:
-                return (3*i+2);
-            case 3:
-                return (3*i+3);
-            case 4:
-                return (int)((i-1)/3);
-            default:
-                return 0;
+            H.Print_Details();
+            c=in.nextInt();
         }
+        while (c==6)
+        {
+            Hint(i);
+            c=in.nextInt();
+        }
+        if (c==-1)
+            return 0;
+        else if (i>12)
+            return 40;
+        else if (c==1)
+            return 3*i+1;
+        else if (c==2)
+            return 3*i+2;
+        else if(c==3)
+            return 3*i+3;
+        else if(c==4)
+            return (i-1)/3;
+        else
+            return i;
     }
 
     public void Fight(Hero Player,Monster M,int Pos)
     {
+        M.Print_Details();
         System.out.println("Starting Fight!");
         while((Player.HP>0) && (M.HP>0))
         {
@@ -319,6 +356,8 @@ class Game
             {
                 Player.Moves_Count=0;
                 Player.Moves_Special=3;
+                if (Player instanceof Warrior)
+                    Player.Moves_Special++;
                 System.out.println("Special Power Activated!");
             }
             else
@@ -331,7 +370,7 @@ class Game
         {
             Player.Kills++;
             Player.XP += M.Level * 20;
-            if (Player.XP >= 60)
+            if (Player.XP >= 60 && Player.Level<4)
             {
                 Player.Level = 4;
                 System.out.println("Level Up To Level 4!");
@@ -339,7 +378,7 @@ class Game
                 Player.AP++;
                 Player.DP++;
             }
-            else if (Player.XP >= 40)
+            else if (Player.XP >= 40 && Player.Level<3)
             {
                 Player.Level = 3;
                 System.out.println("Level Up To Level 3!");
@@ -347,7 +386,7 @@ class Game
                 Player.AP++;
                 Player.DP++;
             }
-            else if (Player.XP >= 20)
+            else if (Player.XP >= 20 && Player.Level<2)
             {
                 Player.Level = 2;
                 System.out.println("Level Up To Level 2!");
@@ -360,12 +399,41 @@ class Game
             Player.HP = Player.Max_HP;
             M.HP = M.Max_HP;
             if (Pos==40)
-                System.out.println("You Won!");
+                System.out.println(">>>>>----- You Won! -----<<<<<,,");
         }
 
         if (Player.HP<=0)
-            System.out.println("You Lost! Please Start Again");
+            System.out.println(">>>>>----- You Lost! Please Start Again -----<<<<<");
 
+    }
+
+    private void Hint(int i)
+    {
+        System.out.println("----- Hint -----");
+        int p1=0,p2=0,p3=0;
+        if (i<13)
+        {
+            p1 = Weight(3 * i + 1) + Area.get(3 * i + 1).Level;
+            p2 = Weight(3 * i + 2) + Area.get(3 * i + 2).Level;
+            p3 = Weight(3 * i + 3) + Area.get(3 * i + 3).Level;
+        }
+        if(p1<=p2 && p2<=p3)
+            System.out.println("Choose Path 1");
+        else if(p2<=p1 && p2<=p3)
+            System.out.println("Choose Path 2");
+        else if(p3<=p1 && p3<=p1)
+            System.out.println("Choose Path 3");
+    }
+
+    private int Weight(int i)
+    {
+        int sum=0;
+        while(i<40)
+        {
+            sum += Area.get(i).Level;
+            i=3*i+1;
+        }
+        return sum;
     }
     public ArrayList<user> getUsernames() { return Usernames; }
 }
@@ -428,11 +496,11 @@ public class ArchLegends
                         {
                             user U = new user(S,A);
                             X.getUsernames().add(U);
-                            System.out.println("User Created.");
+                            System.out.println("User Created");
                         }
-
                     }
                     break;
+
                 case 2:
                     System.out.println("Enter Username");
                     String Name = in.next();
@@ -457,7 +525,5 @@ public class ArchLegends
                     System.out.println("Invalid Choice");
             }
         }while (Q_Main!=3);
-
     }
 }
-
