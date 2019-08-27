@@ -336,8 +336,11 @@ class Game
             Player.setLocation(0);
             Player.setHP(100);
             Player.setXP(0);
-            Player.setAP(Player.getAP()-Player.getLevel());
-            Player.setDP(Player.getDP()-Player.getLevel());
+            if (Player.getLevel()>1)
+            {
+                Player.setAP(Player.getAP()-Player.getLevel());
+                Player.setDP(Player.getDP()-Player.getLevel());
+            }
             Player.setLevel(1);
             Player.setMoves_Special(0);
             Player.setMoves_Count(0);
