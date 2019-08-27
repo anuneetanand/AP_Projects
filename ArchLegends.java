@@ -29,10 +29,10 @@ abstract class Hero
         Moves_Special = 0;
         Moves_Count = 0;
         Kills = 0;
-        Location =0;
+        Location = 0;
     }
 
-    protected void Attack(Monster M)
+    public void Attack(Monster M)
     {
         System.out.println("You Chose To Attack.");
         System.out.println("Inflicted "+ this.AP + " Damage To The Monster");
@@ -44,7 +44,7 @@ abstract class Hero
             Moves_Count++;
     }
 
-    protected void Defend(Monster M)
+    public void Defend(Monster M)
     {
         System.out.println("You Chose To Defend");
         System.out.println("Monster Attack Reduced By "+ this.DP);
@@ -142,7 +142,7 @@ class Healer extends Hero
 abstract class Monster
 {
     protected int HP;
-    protected int Max_HP;
+    protected final int Max_HP;
     protected final int Level;
 
     public Monster(int HP, int Level)
@@ -159,7 +159,7 @@ abstract class Monster
         while ((x<-1)||(x>1))
         { x = r.nextGaussian(); }
         x += 1;
-        x *= this.HP/16;
+        x *= this.HP/8;
         return (int)(x);
     }
 
@@ -271,8 +271,8 @@ class Game
         System.out.println("Starting Game...");
         System.out.println("Welcome "+ U.getName()+", You Are At Location: "+U.getAvatar().Location);
         Hero Player = U.getAvatar();
-        int Pos = -1;
-        while(Pos!=0 && Pos<40 && Player.HP>0)
+        int Pos = 0;
+        while(Pos>=0 && Pos<40 && Player.HP>0)
         {
             Pos=Move(Player,Player.Location);
             Player.Location=Pos;
@@ -289,7 +289,9 @@ class Game
 
     public int Move(Hero H,int i)
     {
-        System.out.println("Choose A Path :-");
+        if (i>12)
+            return 40;
+        System.out.println("Choose An Option :-");
         System.out.println("1: Go To Location: "+(3*i+1));
         System.out.println("2: Go To Location: "+(3*i+2));
         System.out.println("3: Go To Location: "+(3*i+3));
@@ -309,9 +311,7 @@ class Game
             c=in.nextInt();
         }
         if (c==-1)
-            return 0;
-        else if (i>12)
-            return 40;
+            return -1;
         else if (c==1)
             return 3*i+1;
         else if (c==2)
@@ -413,16 +413,17 @@ class Game
         int p1=0,p2=0,p3=0;
         if (i<13)
         {
-            p1 = Weight(3 * i + 1) + Area.get(3 * i + 1).Level;
-            p2 = Weight(3 * i + 2) + Area.get(3 * i + 2).Level;
-            p3 = Weight(3 * i + 3) + Area.get(3 * i + 3).Level;
+            p1 = Weight(3 * i + 1) * Area.get(3 * i + 1).Level;
+            p2 = Weight(3 * i + 2) * Area.get(3 * i + 2).Level;
+            p3 = Weight(3 * i + 3) * Area.get(3 * i + 3).Level;
         }
         if(p1<=p2 && p2<=p3)
-            System.out.println("Choose Path 1");
+            System.out.println("Choose First Path");
         else if(p2<=p1 && p2<=p3)
-            System.out.println("Choose Path 2");
+            System.out.println("Choose Second Path");
         else if(p3<=p1 && p3<=p1)
-            System.out.println("Choose Path 3");
+            System.out.println("Choose Third Path");
+        System.out.println("----------------");
     }
 
     private int Weight(int i)
@@ -431,7 +432,17 @@ class Game
         while(i<40)
         {
             sum += Area.get(i).Level;
-            i=3*i+1;
+            if (3*i+3<40)
+            {
+                if (Area.get(3 * i + 1).Level <= Area.get(3 * i + 2).Level && Area.get(3 * i + 1).Level <= Area.get(3 * i + 3).Level)
+                    i = 3 * i + 1;
+                else if (Area.get(3 * i + 2).Level <= Area.get(3 * i + 1).Level && Area.get(3 * i + 2).Level <= Area.get(3 * i + 3).Level)
+                    i = 3 * i + 2;
+                else
+                    i = 3 * i + 3;
+            }
+            else
+                i= 3 * i + 1;
         }
         return sum;
     }
