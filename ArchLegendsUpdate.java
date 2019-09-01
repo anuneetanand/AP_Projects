@@ -299,7 +299,7 @@ class Minion extends SideKick implements Cloneable
                 return X;
             else
                 System.out.println("Cloning Problem");
-                return X;
+            return X;
         }
         catch (CloneNotSupportedException e)
         { return null; }
@@ -310,6 +310,7 @@ class Minion extends SideKick implements Cloneable
         for (int i=0;i<3;i++)
             Clones.add(this.clone());
         Cloned = 1;
+        System.out.println("Cloning Done");
     }
 
     public ArrayList<Minion> getClones() { return Clones; }
@@ -364,8 +365,7 @@ abstract class Monster
                 System.out.println("LionFang Special Attack!");
                 D = Math.round(10*(H.getHP() / 2))/10.0;
             }
-        if (x>0) {D-=H.getDP();}
-        if (x>1) {D-=5;}
+        if (x==1) {D-=H.getDP();}
         if (D<0) {D=0.0;}
         H.setHP(H.getHP()-D);
         if (H.getHP()<0){H.setHP(0.0);}
@@ -488,7 +488,6 @@ class Layout
 
 class Game
 {
-
     // Game Simulation
     private Scanner in = new Scanner(System.in);
     private ArrayList <User> Usernames;
@@ -549,7 +548,7 @@ class Game
         System.out.println("4: Go Back");
         System.out.println("5: Print Stats");
         System.out.println("6: Hint");
-        System.out.println("7: Buy A SideKick Instead Of Level Upgrade");
+        System.out.println("7: Buy A SideKick / Level Upgrade");
         System.out.println("Press -1 To Exit");
         int c = in.nextInt();
         while ((c>4)&&(c<8))
@@ -586,6 +585,7 @@ class Game
     {
         M.Print_Details();
         SideKick S = null;
+        int f=0;
         System.out.println("Do You Want To Use A SideKick? (yes/no)");
         String c = in.next();
         if (c.equals("yes"))
@@ -602,17 +602,20 @@ class Game
                     if (a.equals("yes"))
                         ((Minion) S).Multiply();
                 }
+                if ((S instanceof Knight) && (M instanceof Zombie))
+                {
+                    Player.setDP(Player.getDP()+5);
+                    f=1;
+                }
             }
             else
             {
                 System.out.println("No SideKicks Available");
             }
         }
-
         System.out.println("Starting Fight!");
         while((Player.getHP()>0) && (M.getHP()>0))
         {
-            int f=0;
             int SA=0;
             System.out.println("Choose Move :-");
             System.out.println("1: Attack");
@@ -634,7 +637,7 @@ class Game
                     { for (Minion Z : ((Minion) S).getClones()) Z.Attack(M); }
                 }
                 if (M.getHP()<0) break;
-                M.Attack(Player,S,f);
+                M.Attack(Player,S,0);
             }
             else if (Q==2)
             {
@@ -642,15 +645,8 @@ class Game
                 if (Player.getMoves_Special()>0)
                     Player.Use_Special_Power(M);
                 Player.Defend(M);
-                if ((S!=null)&&(S.getHP()>0))
-                {
-                    S.Attack(M);
-                    if ((S instanceof Minion) && ((Minion) S).getCloned()==1)
-                    { for (Minion Z : ((Minion) S).getClones()) Z.Attack(M); }
-                    if ((S instanceof Knight)&&(M instanceof Zombie)){f++;}
-                }
                 if (M.getHP()<0) break;
-                M.Attack(Player,S,f);
+                M.Attack(Player,S,1);
             }
             else if ((Q==3) && (SA==1))
             {
@@ -664,7 +660,11 @@ class Game
             {
                 System.out.println("Invalid Move");
             }
+            if (S!=null)
+                if ((f==1)&&(S.getHP()<=0))
+                { Player.setDP(Player.getDP()-5); f=0;}
         }
+        if (f==1) {Player.setDP(Player.getDP()-5);}
         Update(Player,S,M,Pos);
     }
 
@@ -707,7 +707,6 @@ class Game
             Player.setDP(Player.getDP()+1-Player.getLevel());
             Player.setLevel(1);
         }
-
     }
 
     // Updating Details After Fight
@@ -719,21 +718,23 @@ class Game
             {
                 if (S.getHP()<=0)
                     Player.getSideKicks().remove(0);
-                S.setHP(S.Max_HP);
-                S.setXP(S.getXP()+M.getLevel()*2);
-                S.setAP(S.getAP()+(int)(S.getXP()/5));
-                if ((S instanceof Minion) && ((Minion) S).getCloned()==1)
-                    (((Minion) S).getClones()).clear();
+                else
+                {
+                    S.setHP(S.Max_HP);
+                    S.setXP(S.getXP() + M.getLevel() * 2);
+                    S.setAP(S.getAP() + (int) (S.getXP() / 5));
+                    if ((S instanceof Minion) && ((Minion) S).getCloned() == 1)
+                        (((Minion) S).getClones()).clear();
+                }
             }
             Player.setKills(Player.getKills()+1);
             Player.setXP(Player.getXP()+ M.getLevel() * 20);
-            LevelUp(Player);
             System.out.println("Successfully Killed The Monster.");
             System.out.println("HP Restored.");
             Player.setHP(Player.getMax_HP());
             M.setHP(M.getMax_HP());
             if (Pos==40)
-                System.out.println(">>>>>----- You Won! You Saved ThunderForge -----<<<<<,,");
+                System.out.println(">>>>>----- You Won! You Saved ThunderForge -----<<<<<");
         }
         else if (Player.getHP()<=0)
         {
@@ -783,6 +784,7 @@ class Game
                 System.out.println("Returning...");
                 break;
             case 3:
+                LevelUp(H);
                 System.out.println("Returning...");
                 break;
             default:
@@ -832,9 +834,7 @@ class Game
         }
         return sum;
     }
-    
     public ArrayList<User> getUsernames() { return Usernames; }
-
 }
 
 public class ArchLegendsUpdate
