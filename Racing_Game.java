@@ -56,7 +56,6 @@ class Cricket extends Tile
 }
 
 // Exceptions
-
 class SnakeBiteException extends Exception
 { public SnakeBiteException(String message) { super(message); }}
 
@@ -87,7 +86,6 @@ class GenericList <T>
 }
 
 // Game Classes
-
 class User
 {
     // Storing User Data
@@ -307,51 +305,52 @@ class Game
             { G.getTrack().get(k-1); }
             catch (IndexOutOfBoundsException b)
             { k = i; }
-            System.out.println("[Roll:"+X.getRolls()+"] "+X.getName()+" rolled "+z+" at Tile-"+i+". Landed on Tile-"+k+".");
+            finally
+            { System.out.println("[Roll:"+X.getRolls()+"] "+X.getName()+" rolled "+z+" at Tile-"+i+". Landed on Tile-"+k+".");}
 
             j = k;
             if (k == Length)
                 throw new GameWinnerException("");
-            try
-            {
-                System.out.println("            Trying To Shake The Tile-"+k);
-                Shake(G.getTrack().get(k-1));
-                System.out.println(G.getTrack().get(k-1).Make_Sound());
-            }
-            catch (SnakeBiteException s)
-            {
-                System.out.println(s.getMessage());
-                j = k + G.getSnake_Move();
-                X.setSnake_Bites(X.getSnake_Bites()+1);
-            }
-            catch (VultureBiteException v)
-            {
-                System.out.println(v.getMessage());
-                j = k + G.getVulture_Move();
-                X.setVulture_Bites(X.getVulture_Bites()+1);
-            }
-            catch (CricketBiteException c)
-            {
-                System.out.println(c.getMessage());
-                j = k + G.getCricket_Move();
-                X.setCricket_Bites(X.getCricket_Bites()+1);
-            }
-            catch (TrampolineException t)
-            {
-                System.out.println(t.getMessage());
-                j = k + G.getTrampoline_Move();
-                X.setTrampolines(X.getTrampolines()+1);
-            }
-
-            if (j!=k)
+            else if (k!=i)
             {
                 try
-                { G.getTrack().get(j-1); }
-                catch (IndexOutOfBoundsException b)
-                { j = k; }
+                {
+                    System.out.println("            Trying To Shake The Tile-" + k);
+                    Shake(G.getTrack().get(k - 1));
+                    System.out.println(G.getTrack().get(k - 1).Make_Sound());
+                }
+                catch (SnakeBiteException s)
+                {
+                    System.out.println(s.getMessage());
+                    j = k + G.getSnake_Move();
+                    X.setSnake_Bites(X.getSnake_Bites() + 1);
+                }
+                catch (VultureBiteException v)
+                {
+                    System.out.println(v.getMessage());
+                    j = k + G.getVulture_Move();
+                    X.setVulture_Bites(X.getVulture_Bites() + 1);
+                }
+                catch (CricketBiteException c)
+                {
+                    System.out.println(c.getMessage());
+                    j = k + G.getCricket_Move();
+                    X.setCricket_Bites(X.getCricket_Bites() + 1);
+                }
+                catch (TrampolineException t)
+                {
+                    System.out.println(t.getMessage());
+                    j = k + G.getTrampoline_Move();
+                    X.setTrampolines(X.getTrampolines() + 1);
+                }
+
+                try
+                { G.getTrack().get(j - 1); }
+                catch (IndexOutOfBoundsException b) { j = k; }
+                finally
+                { System.out.println("            " + X.getName() + " Moved To Tile-" + j); }
+                i = j;
             }
-            System.out.println("            "+X.getName()+" Moved To Tile-"+j);
-            i = j;
         }
     }
 
@@ -397,4 +396,5 @@ public class Racing_Game
         X.Play();
     }
 }
+
 //END OF CODE
