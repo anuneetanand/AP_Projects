@@ -5,10 +5,12 @@
 
 import java.util.*;
 
+// Tile Classes
+
 abstract class Tile
 {
-    // Base Class For Tiles
-    protected int Steps;
+    // Parent Class For Different Types Of Tiles
+    protected final int Steps;
     public Tile(int steps) { Steps = steps; }
     public abstract String  Make_Sound();
 }
@@ -18,7 +20,7 @@ class White extends Tile
     public White() { super(0); }
     @Override
     public String Make_Sound()
-    { return  "I am a White Tile!"; }
+    { return  "            I am a White Tile!"; }
 }
 
 class Trampoline extends Tile
@@ -26,7 +28,7 @@ class Trampoline extends Tile
     public Trampoline(int steps) { super(steps); }
     @Override
     public String Make_Sound()
-    { return  "Ping Pong! I am a Trampoline , you advance " + this.Steps + " Tiles!"; }
+    { return  "            Ping Pong! I am a Trampoline , you advance " + this.Steps + " Tiles!"; }
 }
 
 class Snake extends Tile
@@ -34,7 +36,7 @@ class Snake extends Tile
     public Snake(int steps) { super(steps); }
     @Override
     public String Make_Sound()
-    { return  "Hiss...! I am a Snake , you go back " + Math.abs(this.Steps) + " Tiles!"; }
+    { return  "            Hiss...! I am a Snake , you go back " + Math.abs(this.Steps) + " Tiles!"; }
 }
 
 class Vulture extends Tile
@@ -42,7 +44,7 @@ class Vulture extends Tile
     public Vulture(int steps) { super(steps); }
     @Override
     public String Make_Sound()
-    { return "Yapping...! I am a Vulture , you go back " + Math.abs(this.Steps) + " Tiles!"; }
+    { return "            Yapping...! I am a Vulture , you go back " + Math.abs(this.Steps) + " Tiles!"; }
 }
 
 class Cricket extends Tile
@@ -50,8 +52,10 @@ class Cricket extends Tile
     public Cricket(int steps) { super(steps); }
     @Override
     public String Make_Sound()
-    { return "Chirp...! I am a Cricket , you go back " + Math.abs(this.Steps) + " Tiles!"; }
+    { return "            Chirp...! I am a Cricket , you go back " + Math.abs(this.Steps) + " Tiles!"; }
 }
+
+// Exceptions
 
 class SnakeBiteException extends Exception
 { public SnakeBiteException(String message) { super(message); }}
@@ -67,6 +71,22 @@ class TrampolineException extends Exception
 
 class GameWinnerException extends Exception
 { public GameWinnerException(String message) { super(message); }}
+
+class NoNameException extends Exception
+{ public NoNameException(String message) { super(message); }}
+
+class NegativeIntegerException extends Exception
+{ public NegativeIntegerException(String message) { super(message); }}
+
+class GenericList <T>
+{
+    private ArrayList <T> A;
+    public GenericList() { A = new ArrayList<T>(); }
+    public void add(T o) {A.add(o);}
+    public T get(int i) {return A.get(i);}
+}
+
+// Game Classes
 
 class User
 {
@@ -95,9 +115,9 @@ class User
     public void setTrampolines(int trampolines) { Trampolines = trampolines; }
 }
 
-class Dice
+final class Dice
 {
-    private Random R;
+    private final Random R;
     public Dice() { R = new Random(); }
     public int Roll() { return R.nextInt(6)+1;}
 }
@@ -116,7 +136,7 @@ class Layout
     private  int Trampoline_Count;
     private final int Trampoline_Move;
     private final int Limit;
-    private ArrayList <Tile> Track;
+    private GenericList <Tile> Track;
 
     public Layout(int length)
     {
@@ -131,7 +151,7 @@ class Layout
         Vulture_Move = 0 - (R.nextInt(Math.max(Math.min(Length/8,10),1))+1);
         Trampoline_Count = R.nextInt(Limit)+1;
         Trampoline_Move = (R.nextInt(Math.max(Math.min(Length/8,10),1))+1);
-        Track = new ArrayList<>();
+        Track = new GenericList<Tile>();
         Set_Up();
     }
 
@@ -139,10 +159,10 @@ class Layout
     {
         System.out.println("Setting up the Race Track...");
         Track.add(new White());
-        System.out.println("Danger: There are "+Snake_Count+","+Cricket_Count+","+Vulture_Count+" number of Snakes, Crickets & Vultures respectively on your Track!" );
-        System.out.println("Danger: Each Snake ,Cricket & Vulture can throw you back by  "+Snake_Move+","+Cricket_Move+","+Vulture_Move+" number of Tiles respectively.!" );
-        System.out.println("Good News: There are "+Trampoline_Count+" Trampolines on your Track!");
-        System.out.println("Good News: Each Trampoline can help you advance by " + Trampoline_Move + " number of Tiles");
+        System.out.println("DANGER: There are "+Snake_Count+","+Cricket_Count+","+Vulture_Count+" number of Snakes, Crickets & Vultures respectively on your Track!" );
+        System.out.println("DANGER: Each Snake ,Cricket & Vulture can throw you back by  "+Math.abs(Snake_Move)+","+Math.abs(Cricket_Move)+","+Math.abs(Vulture_Move)+" number of Tiles respectively.!" );
+        System.out.println("GOOD NEWS: There are "+Trampoline_Count+" Trampolines on your Track!");
+        System.out.println("GOOD NEWS: Each Trampoline can help you advance by " + Trampoline_Move + " number of Tiles");
         for (int i=1;i<Length;i++)
             Track.add(Allocate());
     }
@@ -202,7 +222,7 @@ class Layout
     public int getCricket_Move() { return Cricket_Move; }
     public int getVulture_Move() { return Vulture_Move; }
     public int getTrampoline_Move() { return Trampoline_Move; }
-    public ArrayList<Tile> getTrack() { return Track; }
+    public GenericList<Tile> getTrack() { return Track; }
 }
 
 class Game
@@ -222,8 +242,22 @@ class Game
 
     public void Play()
     {
-        System.out.println("Enter the Player's Name:- ");
-        String S = in.nextLine();
+        boolean InputFlag = false;
+        String S="";
+        while(!InputFlag)
+        {
+            System.out.println("Enter the Player's Name:- ");
+            try
+            {
+                S = in.nextLine();
+                if (S.equals(""))
+                    throw new NoNameException("Invalid Name!");
+                else
+                    InputFlag = true;
+            }
+            catch (NoNameException n)
+            { System.out.println(n.getMessage()); }
+        }
         User X = new User(S);
         System.out.println("Starting the game with "+ X.getName()+" at Tile-1.");
         System.out.println("Control transferred to computer for rolling the dice for "+ X.getName()+".");
@@ -235,21 +269,20 @@ class Game
         }
         catch (GameWinnerException g)
         {
-            System.out.println(X.getName()+" wins the race in "+X.getRolls()+ " rolls.");
-            System.out.println("Total Snake Bites: "+X.getSnake_Bites());
-            System.out.println("Total Vulture Bites: "+X.getVulture_Bites());
-            System.out.println("Total Cricket Bites: "+X.getCricket_Bites());
-            System.out.println("Total Trampolines: "+X.getTrampolines());
+            System.out.println("            "+X.getName()+" wins the race in "+X.getRolls()+ " rolls.");
+            System.out.println("            Total Snake Bites = "+X.getSnake_Bites());
+            System.out.println("            Total Vulture Bites = "+X.getVulture_Bites());
+            System.out.println("            Total Cricket Bites = "+X.getCricket_Bites());
+            System.out.println("            Total Trampolines = "+X.getTrampolines());
         }
     }
 
     private void Move(User X) throws GameWinnerException
     {
-        int i = 1;
-        int j;
-        int k;
+        int i=1,j,k,z;
         int cage = 0;
-        int z;
+        if (i == Length)
+            throw new GameWinnerException("");
         while (i!=Length)
         {
             k = i;
@@ -270,7 +303,6 @@ class Game
             z = D.Roll();
             X.setRolls(X.getRolls()+1);
             k = i + z;
-
             try
             { G.getTrack().get(k-1); }
             catch (IndexOutOfBoundsException b)
@@ -278,10 +310,13 @@ class Game
             System.out.println("[Roll:"+X.getRolls()+"] "+X.getName()+" rolled "+z+" at Tile-"+i+". Landed on Tile-"+k+".");
 
             j = k;
+            if (k == Length)
+                throw new GameWinnerException("");
             try
             {
-                System.out.println("Trying To Shake The Tile-"+k);
+                System.out.println("            Trying To Shake The Tile-"+k);
                 Shake(G.getTrack().get(k-1));
+                System.out.println(G.getTrack().get(k-1).Make_Sound());
             }
             catch (SnakeBiteException s)
             {
@@ -314,13 +349,10 @@ class Game
                 { G.getTrack().get(j-1); }
                 catch (IndexOutOfBoundsException b)
                 { j = k; }
-                System.out.println(X.getName()+" Moved To Tile-"+j);
-                k = j;
             }
-            i = k;
+            System.out.println("            "+X.getName()+" Moved To Tile-"+j);
+            i = j;
         }
-        if (i == Length)
-            throw new GameWinnerException("");
     }
 
     private void Shake(Tile x) throws SnakeBiteException,VultureBiteException,CricketBiteException,TrampolineException
@@ -333,10 +365,6 @@ class Game
             throw new CricketBiteException(x.Make_Sound());
         else if (x.getClass().getName().equals("Trampoline"))
             throw new TrampolineException(x.Make_Sound());
-        else
-        {
-            System.out.println(x.Make_Sound());
-        }
     }
 }
 
@@ -355,18 +383,18 @@ public class Racing_Game
             {
                 N = Integer.parseInt((in.next()));
                 if (N<=0)
-                    System.out.println("Please enter a Positive Integer.");
+                    throw new NegativeIntegerException("Please enter a Positive Integer.");
                 else
                     InputFlag = true;
             }
             catch (NumberFormatException m)
-            {
-                System.out.println("Please enter a Positive Integer.");
-            }
+            { System.out.println("Please enter a Positive Integer."); }
+            catch (NegativeIntegerException n)
+            { System.out.println(n.getMessage());}
         }
+
         Game X = new Game(N);
         X.Play();
     }
 }
-
 //END OF CODE
