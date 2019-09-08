@@ -346,7 +346,8 @@ class Game
 
                 try
                 { G.getTrack().get(j - 1); }
-                catch (IndexOutOfBoundsException b) { j = k; }
+                catch (IndexOutOfBoundsException b)
+                { if (j<1) {j = 1;} else {j = k;} }
                 finally
                 { System.out.println("            " + X.getName() + " Moved To Tile-" + j); }
                 i = j;
@@ -396,5 +397,3 @@ public class Racing_Game
         X.Play();
     }
 }
-
-//END OF CODE
