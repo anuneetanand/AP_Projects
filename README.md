@@ -53,18 +53,18 @@ Implemented Huffman and ShannonFano encoding for text compression. Observation: 
 ```
 Generator.py : To generate random test cases
 ```
-**Collaborator** [Rhythm Patel](https://github.com/rhythm-patel)
+**Collaborator:** [Rhythm Patel](https://github.com/rhythm-patel)
 
 ## Marathon :runner:
 A Swing application to find winner of marathon.
 
-## MercuryStore :shopping_cart:
+## Mercury Store :shopping_cart:
 A prototype of online store. The aim of the application is to connect merchants with customers and make the ensuing transaction hassle-free. OOP concepts like interfaces and polymorphism were incorporated while building the application.
 
 ## Placements :student:
 A system for placement office to keep track of student placements and companies.
 
-## RacingGame :snake:
+## Racing Game :snake:
 A dice-roll game like Snakes & Ladder.The game starts with the user entering the total number of tiles on the race track. Each tile represents one position in one dimension. This is a single player game and once the game starts, its the computer who plays the game without any user intervention, and continues playing until the player wins.
 ```
 Tiles: Snake, Vulture, Cricket, White, Trampoline
