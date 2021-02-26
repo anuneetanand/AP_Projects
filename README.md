@@ -1,5 +1,5 @@
 # Java Projects
-Interesting Java projects done as part of courses at `IIITD`
+Java based projects done as part of courses at `IIITD`
 
 ## Folder Structure
 ```
